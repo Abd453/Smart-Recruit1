@@ -1,217 +1,175 @@
+import {
+  BarChart2,
+  Briefcase,
+  Building2,
+  CalendarDays,
+  CheckSquare,
+  ChevronLeft,
+  ChevronRight,
+  LayoutDashboard,
+  LogOut,
+  Settings,
+  Users,
+} from 'lucide-react';
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Link, useLocation } from 'react-router-dom';
+
 const SIDEBAR_SECTIONS = [
   {
     title: 'Main',
     items: [
-      {
-        name: 'Dashboard',
-        icon: BarChart2,
-        color: '#6366f1',
-        href: '/overview',
-      },
-      { name: 'Calendar', icon: Users, color: '#EC4899', href: '/calendar' },
+      { name: 'Dashboard', icon: LayoutDashboard, href: '/overview' },
+      { name: 'Calendar', icon: CalendarDays, href: '/calendar' },
     ],
   },
   {
     title: 'Recruitment',
     items: [
-      { name: 'Candidates', icon: Users, color: '#EC4899', href: '/users' },
-      {
-        name: 'Department',
-        icon: DollarSign,
-        color: '#10B981',
-        href: '/department',
-      },
-      {
-        name: 'ApprovedJobs',
-        icon: PersonStandingIcon,
-        color: '#10B981',
-        href: '/approvedjob',
-      },
+      { name: 'Candidates', icon: Users, href: '/users' },
+      { name: 'Openings', icon: Briefcase, href: '/openings' },
+      { name: 'Departments', icon: Building2, href: '/department' },
+      { name: 'Approved Jobs', icon: CheckSquare, href: '/approvedjob' },
     ],
   },
   {
-    title: 'Reference',
+    title: 'Insights',
     items: [
-      {
-        name: 'Openings',
-        icon: ShoppingBag,
-        color: '#8B5CF6',
-        href: '/openings',
-      },
-      { name: 'Sales', icon: DollarSign, color: '#10B981', href: '/sales' },
-      { name: 'Orders', icon: ShoppingCart, color: '#F59E0B', href: '/orders' },
-      {
-        name: 'Analytics',
-        icon: TrendingUp,
-        color: '#3B82F6',
-        href: '/analytics',
-      },
-    ],
-  },
-  {
-    title: 'Account',
-    items: [
-      { name: 'Settings', icon: Settings, color: '#6EE7B7', href: '/settings' },
-      { name: 'Logout', icon: LogOut, color: '#6EE7B7', href: '/login' },
+      { name: 'Analytics', icon: BarChart2, href: '/analytics' },
+      { name: 'Settings', icon: Settings, href: '/settings' },
     ],
   },
 ];
 
-import {
-  BarChart2,
-  DollarSign,
-  LogOut,
-  Menu,
-  PersonStandingIcon,
-  Settings,
-  ShoppingBag,
-  ShoppingCart,
-  TrendingUp,
-  Users,
-  ChevronUp,
-  ChevronDown,
-} from 'lucide-react';
-import { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-// import { DoubleArrow } from "@mui/icons-material";
-
 const Sidebar = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isReferenceOpen, setReferenceOpen] = useState(false);
-
-  const toggleReferenceSubmenu = () => {
-    setReferenceOpen(!isReferenceOpen);
-  };
+  const [isOpen, setIsOpen] = useState(true);
+  const location = useLocation();
 
   return (
-    <motion.div
-      className={`relative z-10 transition-all duration-300 ease-in-out flex-shrink-0 overflow-x hidden${isSidebarOpen ? 'w-64' : 'w-20'
-        }`}
-      initial={{ width: isSidebarOpen ? 256 : 80 }}
-      animate={{ width: isSidebarOpen ? 256 : 80 }}
+    <motion.aside
+      className="relative z-20 flex-shrink-0 h-full"
+      initial={{ width: 260 }}
+      animate={{ width: isOpen ? 260 : 78 }}
+      transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
     >
-      <div className="h-full bg-white p-4 flex flex-col border-r border-gray-300 overflow-hidden">
-        {isSidebarOpen && (
-          <h1 className="text-lg font-semibold text-black">
-            HR Dashboard
-          </h1>
-        )}
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="p-2 rounded-full hover:bg-gray-300 transition-colors max-w-fit"
-        >
-          <Menu size={24} className="text-black" />
-        </motion.button>
+      <div className="h-full bg-white border-r border-gray-200/80 flex flex-col overflow-hidden shadow-sm">
+        {/* Logo area */}
+        <div className="px-5 pt-6 pb-4 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center flex-shrink-0 shadow-lg shadow-green-500/20">
+            <span className="text-white font-black text-sm">SR</span>
+          </div>
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 'auto' }}
+                exit={{ opacity: 0, width: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden whitespace-nowrap"
+              >
+                <h1 className="text-base font-bold text-gray-900 tracking-tight">
+                  Smart Recruit
+                </h1>
+                <p className="text-[11px] text-gray-400 font-medium -mt-0.5">HR Dashboard</p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
-        <nav className="mt-8 flex-grow overflow-y-auto">
+        {/* Toggle button */}
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="absolute -right-3 top-8 w-6 h-6 bg-white border border-gray-200 rounded-full flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-50 transition-all shadow-sm z-30"
+        >
+          {isOpen ? <ChevronLeft size={14} /> : <ChevronRight size={14} />}
+        </button>
+
+        {/* Navigation */}
+        <nav className="flex-1 px-3 mt-2 overflow-y-auto overflow-x-hidden">
           {SIDEBAR_SECTIONS.map((section) => (
-            <div key={section.title}>
+            <div key={section.title} className="mb-6">
               <AnimatePresence>
-                {isSidebarOpen && (
-                  <motion.div
-                    className="text-black uppercase text-xs font-semibold mb-4"
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.2 }}
+                {isOpen && (
+                  <motion.p
+                    className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.15em] px-3 mb-2"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.15 }}
                   >
                     {section.title}
-                  </motion.div>
+                  </motion.p>
                 )}
               </AnimatePresence>
 
-              {section.title === 'Reference' ? (
-                <li>
-                  <div
-                    className={`flex items-center cursor-pointer p-2 rounded-lg mr-3 mb-1 transition-colors duration-300 ${isReferenceOpen || !isSidebarOpen
-                        ? 'bg-blue-200'
-                        : 'hover:bg-blue-100'
-                      }`}
-                    onClick={toggleReferenceSubmenu}
-                  >
-                    <span className="text-lg text-accent mr-1">📚</span>
-                    {isSidebarOpen && (
-                      <span className="text-sm text-black">Reference</span>
-                    )}
-                    {isSidebarOpen && (
-                      <div className="ml-auto">
-                        {isReferenceOpen ? (
-                          <ChevronUp size={16} className="text-black" />
-                        ) : (
-                          <ChevronDown size={16} className="text-black" />
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  {isReferenceOpen && isSidebarOpen && (
-                    <ul className="pl-4">
-                      {section.items.map((item) => (
-                        <Link key={item.href} to={item.href}>
+              <div className="space-y-1">
+                {section.items.map((item) => {
+                  const isActive = location.pathname === item.href;
+                  return (
+                    <Link key={item.href} to={item.href}>
+                      <div
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group relative
+                          ${isActive
+                            ? 'bg-green-50 text-green-700'
+                            : 'text-gray-500 hover:bg-gray-50 hover:text-gray-800'
+                          }`}
+                      >
+                        {isActive && (
                           <motion.div
-                            className={`flex items-center p-4 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors mb-2`}
-                            initial={{ opacity: 1 }}
-                          >
-                            <item.icon
-                              size={20}
-                              style={{ color: item.color, minWidth: '20px' }}
-                              className="hover:text-green-500"
-                            />
-                            <AnimatePresence>
-                              {isSidebarOpen && (
-                                <motion.span
-                                  className="ml-4 whitespace-nowrap overflow-hidden text-black"
-                                  initial={{ opacity: 0, width: 0 }}
-                                  animate={{ opacity: 1, width: 'auto' }}
-                                  exit={{ opacity: 0, width: 0 }}
-                                  transition={{ duration: 0.2, delay: 0.3 }}
-                                >
-                                  {item.name}
-                                </motion.span>
-                              )}
-                            </AnimatePresence>
-                          </motion.div>
-                        </Link>
-                      ))}
-                    </ul>
-                  )}
-                </li>
-              ) : (
-                section.items.map((item) => (
-                  <Link key={item.href} to={item.href}>
-                    <motion.div
-                      className={`flex items-center p-4 text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors mb-2`}
-                      initial={{ opacity: 1 }}
-                    >
-                      <item.icon
-                        size={20}
-                        style={{ color: item.color, minWidth: '20px' }}
-                        className="hover:text-green-500"
-                      />
-                      <AnimatePresence>
-                        {isSidebarOpen && (
-                          <motion.span
-                            className="ml-4 whitespace-nowrap overflow-hidden text-black"
-                            initial={{ opacity: 0, width: 0 }}
-                            animate={{ opacity: 1, width: 'auto' }}
-                            exit={{ opacity: 0, width: 0 }}
-                            transition={{ duration: 0.2, delay: 0.3 }}
-                          >
-                            {item.name}
-                          </motion.span>
+                            layoutId="activeIndicator"
+                            className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 bg-green-500 rounded-r-full"
+                            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                          />
                         )}
-                      </AnimatePresence>
-                    </motion.div>
-                  </Link>
-                ))
-              )}
+                        <item.icon
+                          size={20}
+                          className={`flex-shrink-0 transition-colors ${isActive ? 'text-green-600' : 'text-gray-400 group-hover:text-gray-600'}`}
+                        />
+                        <AnimatePresence>
+                          {isOpen && (
+                            <motion.span
+                              className="whitespace-nowrap overflow-hidden"
+                              initial={{ opacity: 0, width: 0 }}
+                              animate={{ opacity: 1, width: 'auto' }}
+                              exit={{ opacity: 0, width: 0 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              {item.name}
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           ))}
         </nav>
+
+        {/* Bottom logout */}
+        <div className="px-3 pb-5 border-t border-gray-100 pt-4">
+          <Link to="/login">
+            <div className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200 group`}>
+              <LogOut size={20} className="flex-shrink-0 text-gray-400 group-hover:text-red-500 transition-colors" />
+              <AnimatePresence>
+                {isOpen && (
+                  <motion.span
+                    className="whitespace-nowrap overflow-hidden"
+                    initial={{ opacity: 0, width: 0 }}
+                    animate={{ opacity: 1, width: 'auto' }}
+                    exit={{ opacity: 0, width: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    Logout
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </div>
+          </Link>
+        </div>
       </div>
-    </motion.div>
+    </motion.aside>
   );
 };
 

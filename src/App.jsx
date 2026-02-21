@@ -45,6 +45,7 @@ import SettingsPage from './pages/SettingsPage';
 import CalendarPage from './pages/CalendarPage';
 import DepartmentPage from './pages/DepartmentPage';
 import ApprovedJobPage from './pages/ApprovedJobPage';
+import NotFound from './pages/NotFound';
 
 import { AnimatePresence, motion } from 'framer-motion';
 
@@ -129,9 +130,7 @@ const App = () => {
               path="*"
               element={
                 <PageWrapper>
-                  <h1 className="flex items-center justify-center min-h-screen text-4xl font-bold text-gray-800">
-                    404 Page not Found
-                  </h1>
+                  <NotFound />
                 </PageWrapper>
               }
             />
