@@ -25,89 +25,118 @@ const Modal = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl mx-4 sm:mx-6 lg:mx-8 p-6 relative">
+    <div className="fixed inset-0 flex items-center justify-center z-[100] px-4">
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity"
+        onClick={onClose}
+      />
+      <div className="glass rounded-[2rem] shadow-2xl shadow-green-500/10 w-full max-w-3xl overflow-hidden relative animate-in fade-in zoom-in duration-300">
         <button
           onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+          className="absolute top-6 right-6 p-2 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-all duration-200 z-10"
         >
-          <X />
+          <X className="w-6 h-6" />
         </button>
-        <div className="text-center">
-          <h2 className="text-2xl font-bold mb-4">Job Details</h2>
 
-          <p className="text-gray-600">Job ID: {jobid}</p>
-          <h2 className="text-[24px] sm:text-[30px] text-neutral-900 font-semibold my-2">
+        <div className="p-8 md:p-12 overflow-y-auto max-h-[90vh]">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-bold uppercase tracking-wider rounded-lg">
+              {jobid ? `ID: ${jobid.slice(0, 8)}` : 'Job Detail'}
+            </span>
+          </div>
+
+          <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-6 leading-tight">
             {title}
           </h2>
 
-          <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-center gap-2">
-              <div className="flex items-center gap-2">
-                <FaInfinity />
-                <span>{pertemp}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CiLocationOn />
-                <span>{location}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <RiMoneyDollarBoxLine />
-                <span>{money}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <BiTimeFive />
-                <span>{time}</span>
-              </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            <div className="bg-gray-50/50 p-4 rounded-2xl flex flex-col items-center text-center group hover:bg-white transition-colors">
+              <FaInfinity className="text-green-500 text-xl mb-2" />
+              <span className="text-xs text-gray-500 uppercase font-bold tracking-tighter">Type</span>
+              <span className="text-sm font-semibold text-gray-900">{pertemp}</span>
             </div>
-
-            <div className="space-y-2">
-              {requiredDegree && (
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-red-600">Required Degree:</span>
-                  <span>{requiredDegree}</span>
-                </div>
-              )}
-              {experience && (
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-red-600">Experience:</span>
-                  <span>{experience}</span>
-                </div>
-              )}
-              {qualification && (
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-red-600">Qualification:</span>
-                  <span>{qualification}</span>
-                </div>
-              )}
-              {responsibilities && (
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-red-600">Responsibilities:</span>
-                  <span>{responsibilities}</span>
-                </div>
-              )}
-              {additional && (
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-red-600">Additional Info:</span>
-                  <span>{additional}</span>
-                </div>
-              )}
+            <div className="bg-gray-50/50 p-4 rounded-2xl flex flex-col items-center text-center group hover:bg-white transition-colors">
+              <CiLocationOn className="text-green-500 text-2xl mb-2" />
+              <span className="text-xs text-gray-500 uppercase font-bold tracking-tighter">Location</span>
+              <span className="text-sm font-semibold text-gray-900">{location}</span>
             </div>
-
-            {content && (
-              <div className="mt-4">
-                <h3 className="text-lg text-red-700 font-semibold">Description:</h3>
-                <p>{content}</p>
-              </div>
-            )}
+            <div className="bg-gray-50/50 p-4 rounded-2xl flex flex-col items-center text-center group hover:bg-white transition-colors">
+              <RiMoneyDollarBoxLine className="text-green-500 text-2xl mb-2" />
+              <span className="text-xs text-gray-500 uppercase font-bold tracking-tighter">Salary</span>
+              <span className="text-sm font-semibold text-gray-900">{money}</span>
+            </div>
+            <div className="bg-gray-50/50 p-4 rounded-2xl flex flex-col items-center text-center group hover:bg-white transition-colors">
+              <BiTimeFive className="text-green-500 text-2xl mb-2" />
+              <span className="text-xs text-gray-500 uppercase font-bold tracking-tighter">Posted</span>
+              <span className="text-sm font-semibold text-gray-900">{time}</span>
+            </div>
           </div>
 
-          {/* Apply Button inside Modal */}
-          <Link to={`/applyform/${jobid}/${encodeURIComponent(title)}`}>
-            <button className="border-2 rounded-lg block p-2 w-full text-sm font-semibold bg-green-500 text-white hover:bg-green-800 transition duration-300 mt-6">
-              Apply Now
-            </button>
-          </Link>
+          <div className="space-y-8">
+            {content && (
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
+                  <div className="w-1.5 h-6 bg-green-500 rounded-full"></div>
+                  Description
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  {content}
+                </p>
+              </div>
+            )}
+
+            <div className="grid md:grid-cols-2 gap-8">
+              {(requiredDegree || experience || qualification) && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100 italic">Requirements</h3>
+                  {requiredDegree && (
+                    <div className="flex items-start gap-3">
+                      <div className="w-2 h-2 rounded-full bg-green-500 mt-2"></div>
+                      <span className="text-gray-600 font-medium">Degree: <span className="text-gray-900">{requiredDegree}</span></span>
+                    </div>
+                  )}
+                  {experience && (
+                    <div className="flex items-start gap-3">
+                      <div className="w-2 h-2 rounded-full bg-green-500 mt-2"></div>
+                      <span className="text-gray-600 font-medium">Experience: <span className="text-gray-900">{experience}</span></span>
+                    </div>
+                  )}
+                  {qualification && (
+                    <div className="flex items-start gap-3">
+                      <div className="w-2 h-2 rounded-full bg-green-500 mt-2"></div>
+                      <span className="text-gray-600 font-medium">Qualif.: <span className="text-gray-900">{qualification}</span></span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {(responsibilities || additional) && (
+                <div className="space-y-4">
+                  <h3 className="text-lg font-bold text-gray-900 mb-4 pb-2 border-b border-gray-100 italic">Scope & Extra</h3>
+                  {responsibilities && (
+                    <div className="flex items-start gap-3">
+                      <div className="w-2 h-2 rounded-full bg-blue-500 mt-2"></div>
+                      <span className="text-gray-600 font-medium">Resp.: <span className="text-gray-900">{responsibilities}</span></span>
+                    </div>
+                  )}
+                  {additional && (
+                    <div className="flex items-start gap-3">
+                      <div className="w-2 h-2 rounded-full bg-blue-500 mt-2"></div>
+                      <span className="text-gray-600 font-medium">More: <span className="text-gray-900">{additional}</span></span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-12">
+            <Link to={`/signup`}>
+              <button className="w-full py-4 px-8 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold rounded-2xl shadow-xl shadow-green-500/30 transform transition-all duration-200 hover:-translate-y-1 active:scale-95">
+                Apply for this position
+              </button>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import React, { useState , forwardRef } from 'react';
+import React, { useState, forwardRef } from 'react';
 
 const FAQs = forwardRef((props, ref) => {
   // Array of FAQs
@@ -34,32 +34,39 @@ const FAQs = forwardRef((props, ref) => {
   };
 
   return (
-    <div ref={ref} id="faq" className="text-black py-12 px-4">
-      <div className="col-span-full">
-        <h1 className="bg-gradient-to-r from-green-800 text-black text-5xl font-bold mb-10 text-center">
-          FAQS
-        </h1>
+    <div ref={ref} id="faq" className="py-24 px-6 max-w-4xl mx-auto">
+      <div className="text-center mb-16">
+        <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+          Common <span className="text-green-600">Questions</span>
+        </h2>
+        <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+          Everything you need to know about our recruitment platform.
+        </p>
       </div>
-      <div className="max-w-5xl mx-auto">
-        <div className="space-y-4">
-          {faqData.map((faq, index) => (
-            <div key={index} className="bg-gradient-to-r from-green-500 to-teal-500 p-4 rounded-lg shadow-lg border-2 border-green-700">
-              <button
-                onClick={() => toggleFAQ(index)}
-                className="w-full text-left text-xl font-semibold flex justify-between items-center focus:outline-none"
-              >
+
+      <div className="space-y-4">
+        {faqData.map((faq, index) => (
+          <div key={index} className={`glass overflow-hidden rounded-2xl border transition-all duration-300 ${openIndex === index ? 'border-green-500/50 shadow-lg shadow-green-500/10' : 'border-white/40 shadow-sm'}`}>
+            <button
+              onClick={() => toggleFAQ(index)}
+              className="w-full px-8 py-6 text-left flex justify-between items-center group"
+            >
+              <span className={`text-lg font-bold transition-colors duration-300 ${openIndex === index ? 'text-green-600' : 'text-gray-900 group-hover:text-green-600'}`}>
                 {faq.question}
-                <span>{openIndex === index ? '-' : '+'}</span>
-              </button>
-              {openIndex === index && (
-                <p className="mt-4 text-lg text-white">
+              </span>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${openIndex === index ? 'bg-green-600 text-white rotate-180' : 'bg-gray-100 text-gray-500 group-hover:bg-green-100 group-hover:text-green-600'}`}>
+                <span className="text-xl leading-none">{openIndex === index ? '−' : '+'}</span>
+              </div>
+            </button>
+            <div className={`transition-all duration-300 ease-in-out ${openIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+              <div className="px-8 pb-8 pt-2">
+                <p className="text-gray-600 text-lg leading-relaxed border-t border-gray-100 pt-6">
                   {faq.answer}
                 </p>
-              )}
-              
+              </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </div>
   );

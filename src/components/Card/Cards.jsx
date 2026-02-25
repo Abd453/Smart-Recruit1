@@ -1,42 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { BiTimeFive } from 'react-icons/bi';
-import { CiLocationOn } from 'react-icons/ci';
-import { FaInfinity, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
-import { RiMoneyDollarBoxLine } from 'react-icons/ri';
-import Db from '../../data/db.json'; // Ensure this import is correct
+import api from '../../utils/api';
 import Modal from './Modal';
 import { Link } from 'react-router-dom';
+import { BiTimeFive } from 'react-icons/bi';
+import { FaInfinity, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { CiLocationOn } from 'react-icons/ci';
+import { RiMoneyDollarBoxLine } from 'react-icons/ri';
 
 const Cards = ({ userId, disapply = true, landing = true, jobTitle }) => {
+  const [jobs, setJobs] = useState([]);
   const [currentSection, setCurrentSection] = useState(0);
-  const [animationClass, setAnimationClass] = useState('fadeIn');
   const [selectedCard, setSelectedCard] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const cardsPerSection = 3;
-  const totalSections = Math.ceil(Db.length / cardsPerSection);
+
+  useEffect(() => {
+    setLoading(true);
+    api.get('/jobs')
+      .then(res => {
+        setJobs(res.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Error fetching jobs:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  const totalSections = Math.ceil(jobs.length / cardsPerSection);
 
   const handleNext = () => {
     if (currentSection < totalSections - 1) {
-      setAnimationClass('fadeOut');
-      setTimeout(() => {
-        setCurrentSection(currentSection + 1);
-        setAnimationClass('fadeIn');
-      }, 500); // Match the duration of the fade-out animation
+      setCurrentSection(currentSection + 1);
     }
   };
 
   const handlePrevious = () => {
     if (currentSection > 0) {
-      setAnimationClass('fadeOut');
-      setTimeout(() => {
-        setCurrentSection(currentSection - 1);
-        setAnimationClass('fadeIn');
-      }, 500); // Match the duration of the fade-out animation
+      setCurrentSection(currentSection - 1);
     }
   };
 
-  const currentCards = Db.slice(
+  const currentCards = jobs.slice(
     currentSection * cardsPerSection,
     (currentSection + 1) * cardsPerSection
   );
@@ -50,89 +57,97 @@ const Cards = ({ userId, disapply = true, landing = true, jobTitle }) => {
     setIsModalOpen(false);
     setSelectedCard(null);
   };
-  console.log(Db.length);
+
+  if (loading) return <div className="text-center py-20 text-gray-500">Loading openings...</div>;
 
   return (
-    <div id="#1" className="relative py-10">
-      <div id="#1" className="bg-gradient-to-r from-green-800 text-white">
-        <h1 className="text-center text-black text-5xl font-bold mb-10">
-          Current Openings
-        </h1>
+    <div className="relative py-20 px-4">
+      <div className="text-center mb-16">
+        <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+          Current <span className="text-green-600">Openings</span>
+        </h2>
+        <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+          Join our team and help us build the future of recruitment tech.
+        </p>
       </div>
-      <div className="relative overflow-hidden">
-        <div
-          className={`flex transition-transform duration-500 ease-in-out ${animationClass}`}
-          style={{ transform: `translateX(-${currentSection * 100}%)` }}
-        >
-          {Db.map((db) => (
-            <div key={db.id} className="flex-shrink-0 w-full sm:w-1/3 p-4">
-              <div className="p-6 rounded-lg shadow-lg bg-white transition duration-500 ease-in-out hover:bg-green-500 hover:text-white hover:shadow-black">
-                <span className="flex justify-between items-center gap-4 pb-5">
-                  <h1 className="text-xl">{db.title}</h1>
-                  <span className="flex items-center gap-1">
-                    <BiTimeFive />
-                    {db.time}
-                  </span>
+
+      <div className="max-w-7xl mx-auto relative group">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {currentCards.map((job) => (
+            <div key={job.id} className="glass p-8 rounded-2xl shadow-xl shadow-green-500/5 hover:shadow-green-500/15 hover:-translate-y-2 transition-all duration-500 border border-white/40 group flex flex-col">
+              <div className="flex justify-between items-start mb-6">
+                <h3 className="text-xl font-bold text-gray-900 group-hover:text-green-600 transition-colors duration-300">
+                  {job.title}
+                </h3>
+                <span className="flex items-center gap-1.5 text-sm font-medium text-green-600 bg-green-50 px-3 py-1 rounded-full">
+                  <BiTimeFive className="text-base" />
+                  {job.time}
                 </span>
-                <h6 className="flex items-center gap-1">
-                  <FaInfinity />
-                  {db.pertemp}
-                </h6>
-                <h6 className="flex items-center gap-1">
-                  <CiLocationOn />
-                  {db.location}
-                </h6>
-                <h6 className="flex items-center gap-1">
-                  <RiMoneyDollarBoxLine />
-                  {db.money}
-                </h6>
-                <p className="text-sm text-gray-600 pt-4 border-t-2 mt-4 group-hover:text-white">
-                  {db.description}
-                </p>
-                {/* Removed Apply Now Button */}
-                <button
-                  onClick={() => handleShowMore(db)}
-                  className="border-2 rounded-lg block p-2 w-full text-sm font-semibold bg-slate-500 text-white hover:bg-green-800 transition duration-300 mt-2"
-                >
-                  Show more
-                </button>
               </div>
+
+              <div className="space-y-3 mb-8">
+                <div className="flex items-center gap-2 text-gray-600">
+                  <FaInfinity className="text-green-500" />
+                  <span className="text-sm">{job.pertemp}</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600">
+                  <CiLocationOn className="text-green-500 text-lg" />
+                  <span className="text-sm">{job.location}</span>
+                </div>
+                <div className="flex items-center gap-2 text-gray-600 font-semibold">
+                  <RiMoneyDollarBoxLine className="text-green-500 text-lg" />
+                  <span className="text-sm">{job.money}</span>
+                </div>
+              </div>
+
+              <p className="text-gray-500 text-sm line-clamp-3 mb-8 flex-grow">
+                {job.description}
+              </p>
+
+              <button
+                onClick={() => handleShowMore(job)}
+                className="w-full py-3 px-4 bg-gray-900 text-white font-bold rounded-xl hover:bg-green-600 shadow-lg shadow-black/5 hover:shadow-green-500/20 transition-all duration-300"
+              >
+                View Details
+              </button>
             </div>
           ))}
         </div>
 
         {/* Navigation Arrows */}
-        <button
-          onClick={handlePrevious}
-          disabled={currentSection === 0}
-          className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-800 disabled:opacity-50"
-        >
-          <FaArrowLeft />
-        </button>
-        <button
-          onClick={handleNext}
-          disabled={currentSection === totalSections - 1}
-          className="absolute top-1/2 right-0 transform -translate-y-1/2 bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-800 disabled:opacity-50"
-        >
-          <FaArrowRight />
-        </button>
+        {totalSections > 1 && (
+          <>
+            <button
+              onClick={handlePrevious}
+              disabled={currentSection === 0}
+              className="absolute top-1/2 -left-6 lg:-left-12 transform -translate-y-1/2 bg-white text-gray-900 w-12 h-12 rounded-full shadow-2xl flex items-center justify-center hover:bg-green-600 hover:text-white disabled:opacity-0 transition-all duration-300 border border-gray-100 z-10"
+            >
+              <FaArrowLeft />
+            </button>
+            <button
+              onClick={handleNext}
+              disabled={currentSection === totalSections - 1}
+              className="absolute top-1/2 -right-6 lg:-right-12 transform -translate-y-1/2 bg-white text-gray-900 w-12 h-12 rounded-full shadow-2xl flex items-center justify-center hover:bg-green-600 hover:text-white disabled:opacity-0 transition-all duration-300 border border-gray-100 z-10"
+            >
+              <FaArrowRight />
+            </button>
+          </>
+        )}
 
         {/* Pagination Dots */}
-        <div
-          id="#1"
-          className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2"
-        >
-          {Array.from({ length: totalSections }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentSection(index)}
-              className={`w-3 h-3 rounded-full ${
-                currentSection === index ? 'bg-black-700' : 'bg-black-400'
-              } transition-colors duration-300`}
-              aria-label={`Slide ${index + 1}`}
-            />
-          ))}
-        </div>
+        {totalSections > 1 && (
+          <div className="flex justify-center gap-2 mt-12">
+            {Array.from({ length: totalSections }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentSection(index)}
+                className={`h-2 rounded-full transition-all duration-300 ${currentSection === index ? 'w-8 bg-green-500' : 'w-2 bg-gray-300 hover:bg-gray-400'
+                  }`}
+                aria-label={`Go to section ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Show Modal */}
@@ -152,12 +167,11 @@ const Cards = ({ userId, disapply = true, landing = true, jobTitle }) => {
         responsibilities={selectedCard ? selectedCard.responsibilities : ''}
         additional={selectedCard ? selectedCard.additional : ''}
       >
-        {/* Moved Apply Button to Modal */}
         <Link
-          to={`/signup/${userId}/${encodeURIComponent(selectedCard?.title)}`}
+          to={`/signup`}
         >
-          <button className="border-2 rounded-lg block p-2 w-full text-sm font-semibold bg-green-500 text-white hover:bg-green-800 transition duration-300 mt-4">
-            Apply Now
+          <button className="w-full py-4 px-8 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 shadow-xl shadow-green-500/20 transition-all duration-300 mt-6 md:mt-10">
+            Apply for this position
           </button>
         </Link>
       </Modal>
@@ -166,3 +180,4 @@ const Cards = ({ userId, disapply = true, landing = true, jobTitle }) => {
 };
 
 export default Cards;
+

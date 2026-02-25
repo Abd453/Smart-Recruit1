@@ -36,50 +36,62 @@ const Features = forwardRef((props, ref) => {
   };
 
   return (
-    <section ref={ref} id="features" className="text-black py-12 lg:py-20">
-      
-      <div className="container mx-auto px-4">
-        {/* Heading */}
-        <h1 className="bg-gradient-to-r from-green-800 text-center text-black text-5xl font-bold mb-10 ">
-          Features
-        </h1>
+    <section ref={ref} id="features" className="py-20 bg-white/30 backdrop-blur-sm rounded-3xl my-10 border border-white/20 shadow-2xl shadow-green-500/5">
+      <div className="container mx-auto px-6">
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+            Key <span className="text-green-600">Features</span>
+          </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+            Experience a smarter way to manage your recruitment lifecycle.
+          </p>
+        </div>
 
-        <div className="flex flex-col lg:flex-row items-center lg:justify-between w-full max-w-screen-lg mx-auto">
-          {/* Video on the Left */}
-          <div className="lg:w-1/2 flex flex-col items-center lg:items-start lg:mr-10 space-y-6 lg:space-y-0 lg:space-x-6 lg:flex-row">
-            <div className="flex-1 transition-transform duration-500 ease-in-out transform hover:scale-105">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-12 w-full max-w-6xl mx-auto">
+          {/* Video Column */}
+          <div className="lg:w-1/2 w-full">
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-green-400 to-blue-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
               <video
                 src={Planning}
                 autoPlay
                 loop
                 muted
-                className="w-full h-auto rounded-lg shadow-lg border-4 border-yellow-500"
+                className="relative w-full h-auto rounded-2xl shadow-2xl shadow-black/10 border border-white/20"
               >
                 Your browser does not support the video tag.
               </video>
             </div>
           </div>
 
-          {/* Features List on the Right */}
-          <div className="lg:w-1/2 mt-12 lg:mt-0">
-            <div className="mt-10 space-y-4">
-              {features.map((feature) => (
-                <div
-                  key={feature.id}
-                  className="bg-gradient-to-r from-green-500 to-teal-600 p-6 rounded-lg shadow-lg cursor-pointer hover:scale-105 transition-transform duration-500 ease-in-out"
-                  onClick={() => handleFeatureClick(feature.id)}
-                >
-                  <h3 className="text-2xl font-semibold mb-2">
-                    {feature.icon} <strong>{feature.title}</strong>
+          {/* Features Column */}
+          <div className="lg:w-1/2 w-full space-y-4">
+            {features.map((feature) => (
+              <div
+                key={feature.id}
+                className={`group p-6 rounded-2xl cursor-pointer transition-all duration-300 border ${activeFeature === feature.id
+                    ? 'bg-white shadow-xl border-green-100 scale-[1.02]'
+                    : 'glass hover:bg-white/80 border-transparent hover:border-green-50 text-gray-700'
+                  }`}
+                onClick={() => handleFeatureClick(feature.id)}
+              >
+                <div className="flex items-center gap-4">
+                  <span className="text-3xl filter drop-shadow-sm group-hover:scale-110 transition-transform duration-300">{feature.icon}</span>
+                  <h3 className={`text-xl font-bold transition-colors duration-300 ${activeFeature === feature.id ? 'text-green-600' : 'text-gray-900 group-hover:text-green-600'}`}>
+                    {feature.title}
                   </h3>
-                  {activeFeature === feature.id && (
-                    <p className="text-lg text-neutral-100 mt-2">
-                      {feature.description}
-                    </p>
-                  )}
                 </div>
-              ))}
-            </div>
+                {activeFeature === feature.id && (
+                  <motion.p
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    className="text-gray-600 mt-3 pl-12 leading-relaxed"
+                  >
+                    {feature.description}
+                  </motion.p>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </div>
