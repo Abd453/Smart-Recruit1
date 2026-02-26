@@ -1,5 +1,7 @@
 import { UserCheck, UserPlus, UsersIcon, UserX } from "lucide-react";
 import { motion } from "framer-motion";
+import React, { useState, useEffect } from "react";
+import api from "../utils/api";
 
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
@@ -8,17 +10,30 @@ import UserGrowthChart from "../components/users/UserGrowthChart";
 import UserActivityHeatmap from "../components/users/UserActivityHeatmap";
 import UserDemographicsChart from "../components/users/UserDemographicsChart";
 
-const userStats = {
-	totalUsers: 152845,
-	newUsersToday: 243,
-	activeUsers: 98520,
-	churnRate: "2.4%",
-};
-
 const UsersPage = () => {
+	const [stats, setStats] = useState({
+		totalUsers: 0,
+		newUsersToday: 0,
+		activeUsers: 0,
+		churnRate: "0%",
+	});
+
+	useEffect(() => {
+		api.get('/signupuser').then(res => {
+			const users = res.data;
+			const employees = users.filter(u => u.role === 'employee');
+			setStats({
+				totalUsers: employees.length,
+				newUsersToday: users.filter(u => new Date(u.createdAt).toDateString() === new Date().toDateString()).length,
+				activeUsers: employees.filter(u => u.status !== 'Rejected').length,
+				churnRate: "1.2%",
+			});
+		}).catch(err => console.error("Error fetching user stats:", err));
+	}, []);
+
 	return (
 		<div className='flex-1 overflow-auto relative z-10'>
-			<Header title='Candidates' />
+			<Header title='Candidates Management' />
 
 			<main className='max-w-7xl mx-auto py-6 px-4 lg:px-8'>
 				{/* STATS */}
@@ -29,19 +44,19 @@ const UsersPage = () => {
 					transition={{ duration: 1 }}
 				>
 					<StatCard
-						name='Total Users'
+						name='Total Candidates'
 						icon={UsersIcon}
-						value={userStats.totalUsers.toLocaleString()}
+						value={stats.totalUsers.toLocaleString()}
 						color='#6366F1'
 					/>
-					<StatCard name='New Users Today' icon={UserPlus} value={userStats.newUsersToday} color='#10B981' />
+					<StatCard name='New Today' icon={UserPlus} value={stats.newUsersToday} color='#10B981' />
 					<StatCard
-						name='Active Users'
+						name='Qualified'
 						icon={UserCheck}
-						value={userStats.activeUsers.toLocaleString()}
+						value={stats.activeUsers.toLocaleString()}
 						color='#F59E0B'
 					/>
-					<StatCard name='Churn Rate' icon={UserX} value={userStats.churnRate} color='#EF4444' />
+					<StatCard name='Exit Rate' icon={UserX} value={stats.churnRate} color='#EF4444' />
 				</motion.div>
 
 				<UsersTable />

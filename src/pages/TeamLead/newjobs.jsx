@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import logo from "../../assets/logo.png";
-import axios from "axios";
+import React, { useState, useEffect } from 'react';
+import api from '../../utils/api';
 import Footer from '../../components/Footer';
-import Db from '../../data/db.json'; // Ensure this import is correct
+import logo from "../../assets/logo.png";
+import NavbarT from './navbarT';
 
 export default function NewJobs() {
     const [data, setData] = useState({
@@ -11,14 +11,15 @@ export default function NewJobs() {
         location: "",
         pertemp: "",
         money: "",
-        description: ""
+        description: "",
+        status: "pending"
     });
     const [errors, setErrors] = useState({});
-    const [valid, setValid] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [jobTitles, setJobTitles] = useState([]);
 
     useEffect(() => {
-        axios.get('http://localhost:8001/departments')
+        api.get('/departments')
             .then(response => {
                 if (Array.isArray(response.data)) {
                     const titles = response.data.map(department => department.title);
@@ -31,152 +32,156 @@ export default function NewJobs() {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setData(prevData => ({
-          ...prevData,
-          [name]: value
+            ...prevData,
+            [name]: value
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        let isValid = true;
+        setIsSubmitting(true);
         let validationErrors = {};
 
-        if (data.title === "") {
-            isValid = false;
-            validationErrors.title = "Job title required";
-        }
-        if (data.time === "") {
-            isValid = false;
-            validationErrors.time = "Time required";
-        }
-        // Add more validations as needed
+        if (!data.title) validationErrors.title = "Job title is required";
+        if (!data.time) validationErrors.time = "Time range is required";
 
-        setErrors(validationErrors);
-        setValid(isValid);
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            setIsSubmitting(false);
+            return;
+        }
 
-        if (isValid) {
-            axios.post('http://localhost:8001/jobs', data)
-                .then(result => {
-                    alert("Success");
-                    // Reset the form or handle success
-                    setData({
-                        title: "",
-                        time: "",
-                        location: "",
-                        pertemp: "",
-                        money: "",
-                        description: ""
-                    });
-                })
-                .catch(err => console.log(err));
+        try {
+            await api.post('/jobs', { ...data, status: 'pending' });
+            alert("Requisition sent to manager! 🚀");
+            setData({
+                title: "",
+                time: "",
+                location: "",
+                pertemp: "",
+                money: "",
+                description: "",
+                status: "pending"
+            });
+        } catch (err) {
+            console.error(err);
+            alert("Submission failed. Please check network.");
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     return (
-        <div className="max-w-4xl mx-auto font-sans p-6">
-            <div className="text-center mb-16">
-                <a href="">
-                    <img
-                        src={logo}
-                        alt="logo"
-                        className="w-52 inline-block"
-                    />
-                </a>
-                <h4 className="text-gray-800 text-base font-semibold mt-6">
-                    Jobs to be requested
-                </h4>
-            </div>
+        <div className="min-h-screen bg-gray-50/50 flex flex-col">
+            <NavbarT />
+            <main className="flex-grow py-20 px-4 md:px-12">
+                <div className="max-w-4xl mx-auto">
+                    <div className="text-center mb-16">
+                        <img
+                            src={logo}
+                            alt="logo"
+                            className="w-40 inline-block drop-shadow-xl mb-6"
+                        />
+                        <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
+                            Request <span className="text-blue-600">Requisition</span>
+                        </h1>
+                        <p className="text-gray-500 mt-2 font-medium">Initiate a new recruitment process for your team.</p>
+                    </div>
 
+                    <div className="glass rounded-[2.5rem] p-8 md:p-12 border border-white/60 shadow-2xl shadow-blue-500/5">
+                        <form onSubmit={handleSubmit} className="space-y-8">
+                            <div className="grid md:grid-cols-2 gap-8">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-gray-700 ml-1">Job Category</label>
+                                    <select
+                                        name="title"
+                                        value={data.title}
+                                        onChange={handleChange}
+                                        className="w-full bg-white/50 border border-gray-200 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-blue-500 outline-none transition-all appearance-none cursor-pointer"
+                                    >
+                                        <option value="">Select Department/Role</option>
+                                        {jobTitles.map((title, index) => (
+                                            <option key={index} value={title}>{title}</option>
+                                        ))}
+                                    </select>
+                                    {errors.title && <p className="text-red-500 text-xs ml-2">{errors.title}</p>}
+                                </div>
 
-            <form onSubmit={handleSubmit}>
-                <div className="grid sm:grid-cols-2 gap-8">
-                    <div>
-                        <label className="text-gray-800 text-sm mb-2 block">Job Title</label>
-                        <select
-                            name="title"
-                            value={data.title}
-                            onChange={handleChange}
-                            className="bg-gray-100 w-full text-gray-800 text-sm px-4 py-3.5 rounded-md focus:bg-transparent outline-blue-500 transition-all"
-                            placeholder="Job title"
-                        >
-                            <option value="">Select Job Title</option>
-                            {jobTitles.map((title, index) => (
-                                <option key={index} value={title}>{title}</option>
-                            ))}
-                        </select>
-                        {errors.title && <p className="text-red-500 text-sm">{errors.title}</p>}
-                    </div>
-                    <div>
-                        <label className="text-gray-800 text-sm mb-2 block">Time</label>
-                        <input
-                            name="time"
-                            type="text"
-                            value={data.time}
-                            onChange={handleChange}
-                            className="bg-gray-100 w-full text-gray-800 text-sm px-4 py-3.5 rounded-md focus:bg-transparent outline-blue-500 transition-all"
-                            placeholder="Time"
-                        />
-                        {errors.time && <p className="text-red-500 text-sm">{errors.time}</p>}
-                    </div>
-                    <div>
-                        <label className="text-gray-800 text-sm mb-2 block">Location</label>
-                        <input
-                            name="location"
-                            type="text"
-                            value={data.location}
-                            onChange={handleChange}
-                            className="bg-gray-100 w-full text-gray-800 text-sm px-4 py-3.5 rounded-md focus:bg-transparent outline-blue-500 transition-all"
-                            placeholder="Location"
-                        />
-                        {errors.location && <p className="text-red-500 text-sm">{errors.location}</p>}
-                    </div>
-                    <div>
-                        <label className="text-gray-800 text-sm mb-2 block">Permanent/Temporary</label>
-                        <input
-                            name="pertemp"
-                            type="text"
-                            value={data.pertemp}
-                            onChange={handleChange}
-                            className="bg-gray-100 w-full text-gray-800 text-sm px-4 py-3.5 rounded-md focus:bg-transparent outline-blue-500 transition-all"
-                            placeholder="Permanent / Temporary"
-                        />
-                        {errors.pertemp && <p className="text-red-500 text-sm">{errors.pertemp}</p>}
-                    </div>
-                    <div>
-                        <label className="text-gray-800 text-sm mb-2 block">Money</label>
-                        <input
-                            name="money"
-                            type="text"
-                            value={data.money}
-                            onChange={handleChange}
-                            className="bg-gray-100 w-full text-gray-800 text-sm px-4 py-3.5 rounded-md focus:bg-transparent outline-blue-500 transition-all"
-                            placeholder="Money"
-                        />
-                        {errors.money && <p className="text-red-500 text-sm">{errors.money}</p>}
-                    </div>
-                    <div>
-                        <label className="text-gray-800 text-sm mb-2 block">Description</label>
-                        <textarea
-                            name="description"
-                            value={data.description}
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-gray-700 ml-1">Shift / Time</label>
+                                    <input
+                                        name="time"
+                                        type="text"
+                                        value={data.time}
+                                        onChange={handleChange}
+                                        className="w-full bg-white/50 border border-gray-200 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                        placeholder="e.g. 9:00 AM - 5:00 PM"
+                                    />
+                                    {errors.time && <p className="text-red-500 text-xs ml-2">{errors.time}</p>}
+                                </div>
 
-                            onChange={handleChange}
-                            className="bg-gray-100 w-full text-gray-800 text-sm px-4 py-3.5 rounded-md focus:bg-transparent outline-blue-500 transition-all"
-                            placeholder="Description"
-                        />
-                        {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-gray-700 ml-1">Location Strategy</label>
+                                    <input
+                                        name="location"
+                                        type="text"
+                                        value={data.location}
+                                        onChange={handleChange}
+                                        className="w-full bg-white/50 border border-gray-200 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                        placeholder="e.g. Remote / Addis Ababa"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-gray-700 ml-1">Employment Strategy</label>
+                                    <input
+                                        name="pertemp"
+                                        type="text"
+                                        value={data.pertemp}
+                                        onChange={handleChange}
+                                        className="w-full bg-white/50 border border-gray-200 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                        placeholder="e.g. Full-time / Contract"
+                                    />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className="text-sm font-bold text-gray-700 ml-1">Budget Allocation</label>
+                                    <input
+                                        name="money"
+                                        type="text"
+                                        value={data.money}
+                                        onChange={handleChange}
+                                        className="w-full bg-white/50 border border-gray-200 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                                        placeholder="e.g. Competitive / Negotiable"
+                                    />
+                                </div>
+
+                                <div className="md:col-span-2 space-y-2">
+                                    <label className="text-sm font-bold text-gray-700 ml-1">Role Specifications</label>
+                                    <textarea
+                                        name="description"
+                                        value={data.description}
+                                        rows="4"
+                                        onChange={handleChange}
+                                        className="w-full bg-white/50 border border-gray-200 rounded-2xl px-5 py-4 focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"
+                                        placeholder="Enter key requirements and responsibilities..."
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex justify-center pt-6">
+                                <button
+                                    type="submit"
+                                    disabled={isSubmitting}
+                                    className="w-full md:w-64 py-4 px-8 text-white font-bold tracking-wide rounded-2xl bg-gray-900 hover:bg-blue-600 shadow-xl shadow-black/10 transform transition-all duration-200 hover:-translate-y-1 active:scale-95 disabled:opacity-50"
+                                >
+                                    {isSubmitting ? "Processing..." : "Submit Requisition"}
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
-
-                <div className="mt-12 flex justify-center">
-                    <button
-                        type="submit"
-                        className="py-3.5 px-7 text-sm font-semibold tracking-wider rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
-                    >
-                        Submit
-                    </button>
-                </div>
-            </form>
+            </main>
             <Footer />
         </div>
     );

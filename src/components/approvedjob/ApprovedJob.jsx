@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import MUIDataTable from 'mui-datatables';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import api from '../../utils/api';
 import { motion } from 'framer-motion';
 import Button from '@mui/material/Button';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import MUIDataTable from 'mui-datatables';
 
 const ApprovedJob = () => {
   const [jobs, setJobs] = useState([]);
@@ -11,8 +11,8 @@ const ApprovedJob = () => {
 
   // Fetch jobs from the backend
   const fetchJobs = () => {
-    axios
-      .get('http://localhost:8001/jobs') // Fetching from /jobs endpoint
+    api
+      .get('/jobs') // Fetching from /jobs endpoint
       .then((res) => {
         const acceptedJobs = res.data.filter(
           (job) => job.status === 'Accepted'
@@ -28,8 +28,8 @@ const ApprovedJob = () => {
   const handleAccept = (job) => {
     const updatedJob = { ...job, status: 'Accepted' };
 
-    axios
-      .post('https://localhost:8002', updatedJob) // Posting to /fromdb endpoint
+    api
+      .post('/jobs', updatedJob) // Posting to /jobs endpoint (corrected from mock)
       .then((res) => {
         setJobs((prevJobs) =>
           prevJobs.map((j) => (j.id === job.id ? updatedJob : j))
@@ -43,8 +43,8 @@ const ApprovedJob = () => {
 
   // Handle deleting a job
   const handleDelete = (jobId) => {
-    axios
-      .delete(`https://localhost:8001/jobs/${jobId}`) // Deleting from /jobs endpoint
+    api
+      .delete(`/jobs/${jobId}`) // Deleting from /jobs endpoint
       .then(() => {
         setJobs((prevJobs) => prevJobs.filter((job) => job.id !== jobId));
         console.log(`Job with id ${jobId} deleted successfully`);

@@ -33,10 +33,10 @@ const SIDEBAR_SECTIONS = [
     title: 'Reference',
     items: [
       {
-        name: 'Products',
+        name: 'Openings',
         icon: ShoppingBag,
         color: '#8B5CF6',
-        href: '/products',
+        href: '/openings',
       },
       { name: 'Sales', icon: DollarSign, color: '#10B981', href: '/sales' },
       { name: 'Orders', icon: ShoppingCart, color: '#F59E0B', href: '/orders' },
@@ -86,14 +86,13 @@ const Sidebar = () => {
 
   return (
     <motion.div
-      className={`relative z-10 transition-all duration-300 ease-in-out flex-shrink-0 overflow-x hidden${
-        isSidebarOpen ? 'w-64' : 'w-20'
-      }`}
+      className={`relative z-10 transition-all duration-300 ease-in-out flex-shrink-0 overflow-x hidden${isSidebarOpen ? 'w-64' : 'w-20'
+        }`}
       initial={{ width: isSidebarOpen ? 256 : 80 }}
       animate={{ width: isSidebarOpen ? 256 : 80 }}
     >
       <div className="h-full bg-white p-4 flex flex-col border-r border-gray-300 overflow-hidden">
-      {isSidebarOpen && (
+        {isSidebarOpen && (
           <h1 className="text-lg font-semibold text-black">
             HR Dashboard
           </h1>
@@ -127,11 +126,10 @@ const Sidebar = () => {
               {section.title === 'Reference' ? (
                 <li>
                   <div
-                    className={`flex items-center cursor-pointer p-2 rounded-lg mr-3 mb-1 transition-colors duration-300 ${
-                      isReferenceOpen || !isSidebarOpen
+                    className={`flex items-center cursor-pointer p-2 rounded-lg mr-3 mb-1 transition-colors duration-300 ${isReferenceOpen || !isSidebarOpen
                         ? 'bg-blue-200'
                         : 'hover:bg-blue-100'
-                    }`}
+                      }`}
                     onClick={toggleReferenceSubmenu}
                   >
                     <span className="text-lg text-accent mr-1">📚</span>

@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import MUIDataTable from 'mui-datatables';
+import React, { useState, useEffect } from 'react';
+import api from '../../utils/api';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import axios from 'axios';
+import MUIDataTable from 'mui-datatables';
 
 export default function Department() {
   const [jobs, setJobs] = useState([]);
@@ -13,8 +13,8 @@ export default function Department() {
   const [showAddForm, setShowAddForm] = useState(false);
 
   const fetchJobs = () => {
-    axios
-      .get('http://localhost:8001/departments')
+    api
+      .get('/departments')
       .then((res) => {
         setJobs(res.data || []);
       })
@@ -30,8 +30,8 @@ export default function Department() {
   };
 
   const handleSaveEdit = (jobId) => {
-    axios
-      .patch(`http://localhost:8001/departments/${jobId}`, {
+    api
+      .patch(`/departments/${jobId}`, {
         title: editedName,
         status: editedStatus,
       })
@@ -47,8 +47,8 @@ export default function Department() {
 
   const handleDeleteDepartment = (jobId) => {
     if (window.confirm('Are you sure you want to delete this department?')) {
-      axios
-        .delete(`http://localhost:8001/departments/${jobId}`)
+      api
+        .delete(`/departments/${jobId}`)
         .then((res) => {
           console.log(`Department ${jobId} deleted`);
           fetchJobs(); // Refresh the job list after deleting
@@ -60,8 +60,8 @@ export default function Department() {
   };
 
   const handleAddDepartment = () => {
-    axios
-      .post('http://localhost:8001/departments', {
+    api
+      .post('/departments', {
         title: newDepartmentName,
         status: newDepartmentStatus,
       })

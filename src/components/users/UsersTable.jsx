@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import MUIDataTable from 'mui-datatables';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import api from '../../utils/api';
 import { motion } from 'framer-motion';
+import Button from '@mui/material/Button';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import MUIDataTable from 'mui-datatables';
 import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
-import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import Button from '@mui/material/Button';
+import MenuItem from '@mui/material/MenuItem';
 
 const UsersTable = () => {
   const [users, setUsers] = useState([]);
@@ -16,8 +16,8 @@ const UsersTable = () => {
   const [editStage, setEditStage] = useState('');
 
   const fetchUsers = () => {
-    axios
-      .get('http://localhost:8001/signupuser')
+    api
+      .get('/signupuser')
       .then((res) => {
         const employees = res.data.filter((user) => user.role === 'employee');
         setUsers(employees || []);
@@ -39,8 +39,8 @@ const UsersTable = () => {
   const handleDelete = (userId) => {
     setUsers(users.filter((user) => user.id !== userId));
     // Optional: Send a request to delete the user on the server
-    axios
-      .delete(`http://localhost:8001/signupuser/${userId}`)
+    api
+      .delete(`/signupuser/${userId}`)
       .then(() => {
         console.log(`User with id ${userId} deleted successfully`);
       })
@@ -64,8 +64,8 @@ const UsersTable = () => {
     );
     setOpenEditModal(false);
 
-    axios
-      .put(`http://localhost:8001/signupuser/${selectedUser.id}`, updatedUser)
+    api
+      .put(`/signupuser/${selectedUser.id}`, updatedUser)
       .then(() => {
         console.log('User updated successfully');
       })
@@ -108,13 +108,12 @@ const UsersTable = () => {
           const status = handleStatus(stage, value);
           return (
             <span
-              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                status === 'Pass'
-                  ? 'bg-green-100 text-green-800'
-                  : status === 'Fail'
+              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${status === 'Pass'
+                ? 'bg-green-100 text-green-800'
+                : status === 'Fail'
                   ? 'bg-red-100 text-red-800'
                   : 'bg-blue-100 text-blue-800'
-              }`}
+                }`}
             >
               {status}
             </span>
@@ -197,15 +196,15 @@ const UsersTable = () => {
 
   return (
     <motion.div
-      className="bg-white py-10 min-h-screen grid place-items-center px-4 sm:px-6 md:px-8 lg:px-10"
+      className="py-10 px-4 sm:px-6 lg:px-10"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
-      <div className="w-full overflow-x-auto max-w-4xl">
+      <div className="w-full glass backdrop-blur-md shadow-2xl rounded-3xl border border-white/20 overflow-hidden p-6 max-w-6xl mx-auto">
         <ThemeProvider theme={getMuiTheme()}>
           <MUIDataTable
-            title={'Candidates List'}
+            title={<span className="text-2xl font-black text-gray-900">Candidates Pipeline</span>}
             data={users}
             columns={columns}
             options={options}

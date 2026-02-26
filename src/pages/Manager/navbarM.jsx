@@ -20,66 +20,55 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white border-gray-200 dark:bg-gray-900 dark:border-gray-700">
-      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-        <Link className="flex items-center space-x-3 rtl:space-x-reverse">
-          <img src={logo} className="h-8" alt="IE Networks" />
-          <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-            IE Networks
+    <nav className="sticky top-0 z-50 py-4 backdrop-blur-xl bg-white/70 border-b border-white/20 shadow-sm">
+      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+        <Link to="/" className="flex items-center gap-3 group">
+          <div className="w-10 h-10 bg-green-600 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/20 group-hover:scale-110 transition-transform duration-300">
+            <img src={logo} className="h-6 invert brightness-0" alt="Logo" />
+          </div>
+          <span className="text-xl font-bold text-gray-900 group-hover:text-green-600 transition-colors">
+            Smart-Recruit <span className="text-green-600">Pro</span>
           </span>
         </Link>
 
-        {/* Hamburger Menu Button for mobile */}
+        {/* Desktop Links */}
+        <div className="hidden md:flex items-center gap-8">
+          <Link
+            to="/managerhome"
+            className="text-sm font-bold text-gray-600 hover:text-green-600 transition-colors"
+          >
+            Dashboard
+          </Link>
+          <Link
+            to="/jobstable"
+            className="text-sm font-bold text-gray-600 hover:text-green-600 transition-colors"
+          >
+            Pending Approval
+          </Link>
+          <div className="h-6 w-px bg-gray-200"></div>
+          <button className="px-5 py-2.5 bg-gray-900 text-white text-sm font-bold rounded-xl hover:bg-green-600 shadow-lg shadow-black/5 hover:shadow-green-500/20 transition-all duration-300">
+            Manager Access
+          </button>
+        </div>
+
+        {/* Mobile Toggle */}
         <button
           onClick={handleToggle}
-          className="inline-flex items-center p-2 ml-3 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none dark:text-gray-400 dark:hover:bg-gray-700"
-          aria-controls="navbar-multi-level"
-          aria-expanded={isOpen}
+          className="md:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-xl transition-colors"
         >
-          <span className="sr-only">Open main menu</span>
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M4 6h16M4 12h16m-7 6h7"
-            ></path>
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16m-7 6h7"} />
           </svg>
         </button>
-
-        {/* Navigation Links */}
-        <div
-          className={`${isOpen ? 'block' : 'hidden'} w-full md:block md:w-auto`}
-          id="navbar-multi-level"
-        >
-          <ul className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:space-x-8 md:flex-row md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700">
-            <li>
-              <button onClick={scrollToHome} className="w-full text-left">
-                <Link
-                  to="#managerhome"
-                  className="block py-2 px-3 text-white bg-green-700 rounded md:bg-transparent md:text-blue-700 md:p-0 md:dark:text-blue-500 dark:bg-blue-600 md:dark:bg-transparent"
-                >
-                  Home
-                </Link>
-              </button>
-            </li>
-            <li>
-              <Link
-                to="/jobstable"
-                className="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
-              >
-                Job To be approved
-              </Link>
-            </li>
-          </ul>
-        </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isOpen && (
+        <div className="md:hidden absolute top-full left-0 w-full bg-white border-b border-gray-100 p-6 space-y-4 animate-in slide-in-from-top duration-300">
+          <Link to="/managerhome" className="block text-lg font-bold text-gray-900">Dashboard</Link>
+          <Link to="/jobstable" className="block text-lg font-bold text-gray-900">Pending Approval</Link>
+        </div>
+      )}
     </nav>
   );
 };

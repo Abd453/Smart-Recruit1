@@ -1,122 +1,110 @@
-import React, { useState } from 'react';
-import { BiTimeFive } from 'react-icons/bi';
-import { CiLocationOn } from 'react-icons/ci';
-import { FaInfinity } from 'react-icons/fa';
-import { RiMoneyDollarBoxLine } from 'react-icons/ri';
-import axios from 'axios';
-import Db from '../../data/auth.json';
+import React, { useState, useEffect } from 'react';
+import api from '../../utils/api';
 import Footer from '../../components/Footer';
-import Navbar from './navbarM';
+import NavbarM from './navbarM';
+import { BiTimeFive } from "react-icons/bi";
+import { FaInfinity } from "react-icons/fa";
+import { CiLocationOn } from "react-icons/ci";
+import { RiMoneyDollarBoxLine } from "react-icons/ri";
 
 const Jobs = () => {
-  // Initialize state to track status for each job
-  const [jobStatus, setJobStatus] = useState(
-    Db.jobs.reduce((acc, job) => {
-      acc[job.id] = 'pending'; // Set initial status to 'pending'
-      return acc;
-    }, {})
-  );
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Function to handle Accept and Reject button clicks
-  const handleJobAction = (jobId, action) => {
-    // Define the updated status
-    const newStatus = action === 'accept' ? 'accepted' : 'rejected';
-    const updatedData = Db.jobs.find((job) => job.id === jobId);
+  const fetchJobs = () => {
+    api.get('/jobs')
+      .then(res => {
+        setJobs(res.data.filter(j => j.status === 'pending') || []);
+      })
+      .catch(err => console.error(err))
+      .finally(() => setLoading(false));
+  };
 
-    // Update the status state for the job
-    setJobStatus((prevStatus) => ({
-      ...prevStatus,
-      [jobId]: newStatus,
-    }));
+  useEffect(() => {
+    fetchJobs();
+  }, []);
 
-    // Send data to the server only if status is 'accepted'
-    if (newStatus === 'accepted') {
-      axios
-        .post('http://localhost:8001/jobsto', {
-          ...updatedData,
-          status: newStatus,
-        })
-        .then((result) => {
-          alert(`${updatedData.title} ${newStatus} successfully!`);
-        })
-        .catch((error) => {
-          console.error('There was an error submitting the form!', error);
-        });
+  const handleJobAction = async (jobId, status) => {
+    try {
+      await api.patch(`/jobs/${jobId}`, { status });
+      alert(`Job requisition ${status.toLowerCase()}!`);
+      fetchJobs();
+    } catch (err) {
+      console.error(err);
+      alert("Action failed. Check console.");
     }
   };
 
   return (
-    <div>
-      <Navbar />
-      <div className="  bg-cover bg-center flex">
-        <div className="flex gap-10 justify-center flex-wrap items-center py-10">
-          {Db.jobs.map((db) => (
-            <div
-              key={db.id}
-              className="mt-10 group group/item w-[250px] p-[20px] bg-white rounded-[10px]
-              hover:bg-gradient-to-r from-[#868686] to-[#eea12f] shadow-lg shadow-greyIsh-400/700 hover:shadow-lg"
-            >
-              <span className="flex justify-between items-center gap-4 pb-5">
-                <h1 className="text-[24px]">{db.title}</h1>
-                <span className="flex items-center gap">
-                  <BiTimeFive />
-                  {db.time}
-                </span>
-              </span>
-              <h6 className="flex items-center gap">
-                <span>
-                  <FaInfinity />
-                </span>
-                {db.pertemp}
-              </h6>
-              <h6 className="flex items-center gap">
-                <span>
-                  <CiLocationOn />
-                </span>
-                {db.location}
-              </h6>
-              <h6 className="flex items-center gap">
-                <span>
-                  <RiMoneyDollarBoxLine />
-                </span>
-                {db.money}
-              </h6>
+    <div className="min-h-screen bg-gray-50/50 flex flex-col">
+      <NavbarM />
 
-              <p
-                className="text-[13px] text-[#95959] pt-[20px] border-t-[2px] mt-[20px]
-                group-hover:text-white pb-5"
-              >
-                {db.description}
-              </p>
+      <main className="flex-grow py-20 px-4 md:px-12">
+        <div className="max-w-7xl mx-auto">
+          <div className="mb-16 text-center">
+            <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 tracking-tight">
+              Requisition <span className="text-orange-500">Pipeline</span>
+            </h1>
+            <p className="text-gray-500 mt-4 text-lg font-medium italic">Pending approvals for new recruitment requests.</p>
+          </div>
 
-              <div className="flex items-center justify-between">
-                <button
-                  onClick={() => handleJobAction(db.id, 'accept')}
-                  className={`shadow-lg shadow-[#86fa7bea] ${
-                    jobStatus[db.id] === 'accepted'
-                      ? 'bg-green-700'
-                      : 'hover:bg-green-700'
-                  } hover:shadow-lg mt-10 bg-transparent font-semibold hover:text-white py-2 px-4 border hover:border-transparent rounded`}
-                  disabled={jobStatus[db.id] !== 'pending'}
-                >
-                  {jobStatus[db.id] === 'accepted' ? 'Accepted' : 'Accept'}
-                </button>
-                <button
-                  onClick={() => handleJobAction(db.id, 'reject')}
-                  className={`shadow-lg shadow-[#fd8787ea] ${
-                    jobStatus[db.id] === 'rejected'
-                      ? 'bg-red-700'
-                      : 'hover:bg-red-700'
-                  } hover:shadow-lg pr-15 mt-10 bg-transparent font-semibold hover:text-white py-2 px-4 border hover:border-transparent rounded`}
-                  disabled={jobStatus[db.id] !== 'pending'}
-                >
-                  {jobStatus[db.id] === 'rejected' ? 'Rejected' : 'Reject'}
-                </button>
+          <div className="flex gap-8 justify-center flex-wrap">
+            {loading ? (
+              <div className="animate-pulse text-gray-400 font-bold uppercase tracking-widest text-2xl">Scanning Network...</div>
+            ) : jobs.length === 0 ? (
+              <div className="glass p-12 rounded-[2rem] text-center border border-white/60">
+                <p className="text-gray-400 font-bold italic">No pending job requests found.</p>
               </div>
-            </div>
-          ))}
+            ) : jobs.map((job) => (
+              <div
+                key={job.id}
+                className="glass w-full max-w-[340px] p-8 rounded-[2.5rem] border border-white/60 shadow-xl shadow-gray-200/50 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group"
+              >
+                <div className="flex justify-between items-start mb-6">
+                  <h3 className="text-2xl font-extrabold text-gray-900 group-hover:text-orange-600 transition-colors">{job.title}</h3>
+                  <div className="bg-orange-100 text-orange-600 p-2 rounded-xl">
+                    <BiTimeFive size={20} />
+                  </div>
+                </div>
+
+                <div className="space-y-3 mb-8">
+                  <div className="flex items-center gap-3 text-gray-600 font-medium">
+                    <FaInfinity className="text-gray-400" />
+                    <span>{job.pertemp}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-gray-600 font-medium">
+                    <CiLocationOn className="text-gray-400" />
+                    <span>{job.location}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-gray-800 font-bold">
+                    <RiMoneyDollarBoxLine className="text-green-600" />
+                    <span>{job.money}</span>
+                  </div>
+                </div>
+
+                <p className="text-sm text-gray-500 leading-relaxed line-clamp-3 mb-8 min-h-[4.5rem]">
+                  {job.description}
+                </p>
+
+                <div className="flex items-center gap-4 pt-6 border-t border-white/20">
+                  <button
+                    onClick={() => handleJobAction(job.id, 'Accepted')}
+                    className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-green-500/20 transition-all active:scale-95"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => handleJobAction(job.id, 'Rejected')}
+                    className="flex-1 bg-white border border-red-200 text-red-600 font-bold py-3 px-4 rounded-xl hover:bg-red-50 transition-all active:scale-95"
+                  >
+                    Reject
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      </main>
       <Footer />
     </div>
   );
