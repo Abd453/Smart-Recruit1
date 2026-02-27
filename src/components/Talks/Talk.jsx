@@ -31,53 +31,55 @@ const Talk = forwardRef((props, ref) => {
   };
 
   return (
-    <div ref={ref} id="contact" className="py-12 px-4 mb-10">
-      <div className="max-w-4xl mx-auto bg-green-600 rounded-lg shadow-lg p-8">
-        <h1 className="text-3xl font-bold text-green-800 mb-6">Contact Us</h1>
-        <form ref={form} onSubmit={handleSubmit}>
-          <div className="mb-6">
-            <label
-              htmlFor="email"
-              className="block text-gray-700 text-sm font-semibold mb-2"
+    <div ref={ref} id="contact" className="py-24 px-6 max-w-4xl mx-auto">
+      <div className="glass p-10 md:p-16 rounded-3xl shadow-2xl shadow-green-500/10 border border-white/60 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full -mr-16 -mt-16 blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-teal-500/10 rounded-full -ml-16 -mb-16 blur-3xl"></div>
+
+        <div className="relative z-10">
+          <h2 className="text-3xl md:text-5xl font-black text-gray-900 mb-4 tracking-tight">
+            Let's <span className="text-green-600">Connect</span>
+          </h2>
+          <p className="text-gray-600 mb-10 text-lg">
+            Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible.
+          </p>
+
+          <form ref={form} onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 gap-6">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">Your Email</label>
+                <input
+                  type="email"
+                  name="user_email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  placeholder="name@company.com"
+                  className="w-full px-5 py-4 bg-white/50 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-green-500/10 focus:border-green-500 outline-none transition-all duration-300 placeholder:text-gray-400"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2 ml-1">Message</label>
+                <textarea
+                  name="message"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  required
+                  rows="5"
+                  placeholder="How can we help you?"
+                  className="w-full px-5 py-4 bg-white/50 border border-gray-200 rounded-2xl focus:ring-4 focus:ring-green-500/10 focus:border-green-500 outline-none transition-all duration-300 placeholder:text-gray-400 resize-none"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full md:w-auto px-10 py-4 bg-gray-900 text-white font-bold rounded-2xl hover:bg-green-600 shadow-xl shadow-black/10 hover:shadow-green-500/30 active:scale-95 transition-all duration-300"
             >
-              Email
-            </label>
-            <input
-              type="email"
-              name="user_email" // Updated to match emailjs field name
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="Enter your email here"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-            />
-          </div>
-          <div className="mb-6">
-            <label
-              htmlFor="message"
-              className="block text-gray-700 text-sm font-semibold mb-2"
-            >
-              Message
-            </label>
-            <textarea
-              name="message" // Updated to match emailjs field name
-              id="message1"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              required
-              rows="4"
-              placeholder="If you have any queries, doubts and concerns you can talk to us . . ."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-            />
-          </div>
-          <button
-            type="submit"
-            className="bg-green-700 text-white px-4 py-2 rounded-lg hover:bg-green-800"
-          >
-            Send
-          </button>
-        </form>
+              Send Message
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
